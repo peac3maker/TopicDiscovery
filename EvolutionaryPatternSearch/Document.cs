@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TwitterFeedLogger;
 
 namespace EvolutionaryPatternSearch
 {
@@ -53,6 +54,23 @@ namespace EvolutionaryPatternSearch
                             words.Add(new Word(wordFound,1,0.0,topics[topicId]));
                     }
                 }
+            }
+        }
+
+        public Document(TweetItem item, List<Topic> topics, int id)
+        {
+            Topics = topics;
+            Random rand = new Random();
+            this.Name = id.ToString();
+            foreach (string wordFound in GetWords(item.Text))
+            {
+                if (StopWords.stopWords.Contains(wordFound))
+                {
+                    continue;
+                }
+                //random topic
+                int topicId = rand.Next(0, topics.Count);
+                words.Add(new Word(wordFound, 1, 0.0, topics[topicId]));
             }
         }
 

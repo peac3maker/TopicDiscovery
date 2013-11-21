@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TwitterFeedLogger;
 
 namespace EvolutionaryPatternSearch
 {
@@ -33,6 +34,15 @@ namespace EvolutionaryPatternSearch
             foreach (FileInfo fi in dir.GetFiles())
             {
                 documents.Add(new Document(fi,topics));
+            }
+        }
+
+        public DocumentContainer(List<TweetItem> tweets, List<Topic> topics)
+        {
+            this.Topics = topics;
+            for (int i = 0; i < tweets.Count; i++)
+            {
+                documents.Add(new Document(tweets[i], topics,i));
             }
         }
 

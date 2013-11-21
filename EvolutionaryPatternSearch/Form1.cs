@@ -27,7 +27,7 @@ namespace EvolutionaryPatternSearch
             if (res != System.Windows.Forms.DialogResult.OK)
             {
                 return;
-            }
+            }            
             DirectoryInfo dir = new DirectoryInfo(fdiag.SelectedPath);
             List<Topic> topics = new List<Topic>();
             int countTopics = Convert.ToInt32(textBox1.Text);
@@ -43,11 +43,11 @@ namespace EvolutionaryPatternSearch
                 cont.Perform(rand);
             }
 
-            StringBuilder sbTopic = new StringBuilder();
-            string topicname = string.Empty;
-            int highestamount = 0;
+            StringBuilder sbTopic = new StringBuilder();            
             foreach (Topic topic in cont.Topics)
             {
+                string topicname = string.Empty;
+                int highestamount = 0;
                 sbTopic.Append(topic.name + ":");                
                 
                 foreach (Document document in cont.Documents)

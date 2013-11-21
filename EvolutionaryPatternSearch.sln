@@ -1,7 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EvolutionaryPatternSearch", "EvolutionaryPatternSearch\EvolutionaryPatternSearch.csproj", "{40687D60-7646-4536-9F41-D650375E0013}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitterFeedLogger", "TwitterFeedLogger\TwitterFeedLogger.csproj", "{57C3E47D-15B3-4DEB-BE4F-8F1C5B1D0ABA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,6 +17,10 @@ Global
 		{40687D60-7646-4536-9F41-D650375E0013}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{40687D60-7646-4536-9F41-D650375E0013}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{40687D60-7646-4536-9F41-D650375E0013}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57C3E47D-15B3-4DEB-BE4F-8F1C5B1D0ABA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57C3E47D-15B3-4DEB-BE4F-8F1C5B1D0ABA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57C3E47D-15B3-4DEB-BE4F-8F1C5B1D0ABA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57C3E47D-15B3-4DEB-BE4F-8F1C5B1D0ABA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
