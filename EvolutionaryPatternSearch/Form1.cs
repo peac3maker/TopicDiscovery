@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MongoDB.Driver;
+using MongoDB.Driver.Builders;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -8,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TwitterFeedLogger;
 
 namespace EvolutionaryPatternSearch
 {
@@ -107,6 +110,77 @@ namespace EvolutionaryPatternSearch
 
             //}
             //cont.CreateTopics();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            var connectionString = "mongodb://10.0.0.17/test";
+
+            MongoClient mongoClient = new MongoClient(connectionString);
+            MongoServer mongoServer = mongoClient.GetServer();
+            MongoDatabase db = mongoServer.GetDatabase("test");
+            var collection = db.GetCollection<TweetItem>("TweetItems");
+            DateTime dtmQuery = new DateTime(2013,11,25,17,31,00);
+            DateTime dtmQueryLower = new DateTime(2013,11,25,17,32,00);
+            var query = Query<TweetItem>.Where(t => t.CreationDate >= dtmQuery && t.CreationDate < dtmQueryLower);
+            List<TweetItem> value = collection.Find(query).ToList();
+            
+            List<Topic> topics = new List<Topic>();
+            int countTopics = Convert.ToInt32(textBox1.Text);
+            for (int i = 0; i < countTopics; i++)
+            {
+                topics.Add(new Topic(i.ToString()));
+            }
+            cont = new DocumentContainer(value, topics);
+            Random rand = new Random((int)DateTime.Now.Ticks);
+            List<Word> result;
+            for (int i = 0; i < 50; i++)
+            {
+                cont.Perform(rand);
+            }
+
+            StringBuilder sbTopic = new StringBuilder();
+            foreach (Topic topic in cont.Topics)
+            {
+                string topicname = string.Empty;
+                int highestamount = 0;
+                sbTopic.Append(topic.name + ":");
+
+                foreach (Document document in cont.Documents)
+                {
+                    foreach (string word in document.Words.Where(w => w.Topic == topic).OrderBy(t => t.Name).Select(w => w.Name).Distinct())
+                    {
+                        int amountword = document.Words.Count(w => w.Name == word);
+                        if (amountword > highestamount)
+                        {
+                            highestamount = amountword;
+                            topicname = word;
+                        }
+                        sbTopic.Append(word + " (" + amountword + ") , ");
+                    }
+                }
+                sbTopic.AppendLine();
+                sbTopic.AppendLine();
+                sbTopic.Append(topicname);
+                sbTopic.AppendLine();
+            }
+
+            foreach (Document doc in cont.Documents)
+            {
+                sbTopic.AppendLine();
+                sbTopic.Append(doc.Name + ": (");
+                int wordsindoc = doc.Words.Count;
+                foreach (Topic t in cont.Topics)
+                {
+                    int wordsintopic = doc.Words.Count(w => w.Topic == t);
+                    if(wordsindoc != 0)
+                    sbTopic.Append(wordsintopic * 100 / wordsindoc + ",");
+                }
+                sbTopic.Append(")");
+                sbTopic.AppendLine();
+            }
+            tbRes.Text = sbTopic.ToString();
+
         }
     }
 }
