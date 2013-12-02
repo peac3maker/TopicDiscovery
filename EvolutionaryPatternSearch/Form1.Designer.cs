@@ -34,6 +34,8 @@
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.tbRes = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
+            this.dtmStart = new System.Windows.Forms.DateTimePicker();
+            this.dtmEnd = new System.Windows.Forms.DateTimePicker();
             this.SuspendLayout();
             // 
             // textBox1
@@ -87,11 +89,31 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // dtmStart
+            // 
+            this.dtmStart.CustomFormat = "dd.MM.yyyy hh:mm:ss";
+            this.dtmStart.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.dtmStart.Location = new System.Drawing.Point(471, 12);
+            this.dtmStart.Name = "dtmStart";
+            this.dtmStart.Size = new System.Drawing.Size(200, 20);
+            this.dtmStart.TabIndex = 6;
+            // 
+            // dtmEnd
+            // 
+            this.dtmEnd.CustomFormat = "dd.MM.yyyy hh:mm:ss";
+            this.dtmEnd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.dtmEnd.Location = new System.Drawing.Point(471, 39);
+            this.dtmEnd.Name = "dtmEnd";
+            this.dtmEnd.Size = new System.Drawing.Size(200, 20);
+            this.dtmEnd.TabIndex = 7;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(883, 352);
+            this.Controls.Add(this.dtmEnd);
+            this.Controls.Add(this.dtmStart);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.tbRes);
             this.Controls.Add(this.label2);
@@ -113,6 +135,8 @@
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.TextBox tbRes;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.DateTimePicker dtmStart;
+        private System.Windows.Forms.DateTimePicker dtmEnd;
     }
 }
 

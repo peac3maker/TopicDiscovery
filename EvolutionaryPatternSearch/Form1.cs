@@ -120,8 +120,8 @@ namespace EvolutionaryPatternSearch
             MongoServer mongoServer = mongoClient.GetServer();
             MongoDatabase db = mongoServer.GetDatabase("test");
             var collection = db.GetCollection<TweetItem>("TweetItems");
-            DateTime dtmQuery = new DateTime(2013,11,25,17,31,00);
-            DateTime dtmQueryLower = new DateTime(2013,11,25,17,32,00);
+            DateTime dtmQuery = dtmStart.Value;
+            DateTime dtmQueryLower = dtmEnd.Value ;
             var query = Query<TweetItem>.Where(t => t.CreationDate >= dtmQuery && t.CreationDate < dtmQueryLower);
             List<TweetItem> value = collection.Find(query).ToList();
             

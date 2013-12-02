@@ -68,12 +68,16 @@ namespace EvolutionaryPatternSearch
                     {
                         int WinTopic = doc.Words.Count(w => w.Topic == topic);
                         double propWordinDoc = (double)WinTopic / doc.Words.Count;
-                        double propWordTopic = (double)GetTimesWordsAssignedTopic(word, topic) / GetAmountOfWordsAssignedTopic(word.Topic);
+                        if (topic.WordsInTopic == -1) 
+                            topic.WordsInTopic = GetAmountOfWordsAssignedTopic(word.Topic);
+                        double propWordTopic = (double)GetTimesWordsAssignedTopic(word, topic) / topic.WordsInTopic; 
                         double res = propWordinDoc * propWordTopic;
                         results.AddOrUpdate(topic, res, (key,oldValue) => res);
                     });
                     Topic newTopic = GetNewTopic(results.ToDictionary(kvp=>kvp.Key, kvp=>kvp.Value));
+                    word.Topic.WordsInTopic--;
                     word.Topic = newTopic;
+                    newTopic.WordsInTopic++;
                 }
             }                        
         }

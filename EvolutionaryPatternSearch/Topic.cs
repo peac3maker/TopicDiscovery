@@ -12,6 +12,9 @@ namespace EvolutionaryPatternSearch
         public Topic(string name)
         {
             this.name = name;
+            WordsInTopic = -1;
         }
+
+        public int WordsInTopic { get; set; }        
     }
 }
