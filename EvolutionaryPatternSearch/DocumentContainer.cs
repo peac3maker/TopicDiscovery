@@ -95,7 +95,7 @@ namespace EvolutionaryPatternSearch
                     fixedRes.Add(result.Key, relation);
                 }
             }
-            Random rand = new Random();
+            Random rand = new Random((int)DateTime.Now.Ticks);
             double help = rand.NextDouble();
             double i = 0.0;
             foreach (KeyValuePair<Topic, double> res in fixedRes)

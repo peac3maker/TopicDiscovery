@@ -76,7 +76,7 @@ namespace EvolutionaryPatternSearch
 
         static string[] GetWords(string input)
         {
-            MatchCollection matches = Regex.Matches(input, @"\b[\w']*\b");
+            MatchCollection matches = Regex.Matches(input, @"\b[\w{3,}']*\b");
             var words = from m in matches.Cast<Match>()
                         where !string.IsNullOrEmpty(m.Value)
                         select TrimSuffix(m.Value).Trim().ToLower();

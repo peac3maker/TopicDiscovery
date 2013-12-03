@@ -17,6 +17,7 @@ namespace EvolutionaryPatternSearch
     public partial class Form1 : Form
     {
         DocumentContainer cont;
+        int topWordsNumber = 3;
         public Form1()
         {
             InitializeComponent();
@@ -46,11 +47,13 @@ namespace EvolutionaryPatternSearch
                 cont.Perform(rand);
             }
 
-            StringBuilder sbTopic = new StringBuilder();            
+            StringBuilder sbTopic = new StringBuilder();    
+            
             foreach (Topic topic in cont.Topics)
             {
-                string topicname = string.Empty;
+                topic.name = string.Empty;
                 int highestamount = 0;
+                Dictionary<string, int> mostUsedWords = new Dictionary<string, int>();
                 sbTopic.Append(topic.name + ":");                
                 
                 foreach (Document document in cont.Documents)
@@ -58,16 +61,38 @@ namespace EvolutionaryPatternSearch
                     foreach (string word in document.Words.Where(w => w.Topic == topic).OrderBy(t => t.Name).Select(w =>w.Name).Distinct())
                     {                        
                         int amountword =  document.Words.Count(w => w.Name == word);
-                        if(amountword > highestamount){
-                            highestamount = amountword;
-                            topicname = word;
+                        //if(amountword > highestamount){
+                        //    highestamount = amountword;
+                        //    topicname = word;
+                        //}
+                        if (mostUsedWords.Count < topWordsNumber)
+                        {
+                            mostUsedWords.Add(word, amountword);
+                        }
+                        else
+                        {
+                                List<KeyValuePair<string,int>> dictWords = mostUsedWords.Where(w => w.Value < amountword).ToList();
+                                if (dictWords.Count > 0 && !mostUsedWords.ContainsKey(word))
+                                {
+                                    KeyValuePair<string, int> wordToDelete = dictWords.First();
+                                    mostUsedWords.Remove(wordToDelete.Key);
+                                    mostUsedWords.Add(word, amountword);
+                                }
+                                else if (mostUsedWords.ContainsKey(word))
+                                {
+                                    mostUsedWords[word] += amountword;
+                                }
                         }
                         sbTopic.Append(word + " (" + amountword + ") , ");
                     }
                 }
                 sbTopic.AppendLine();
                 sbTopic.AppendLine();
-                sbTopic.Append(topicname);
+                foreach (KeyValuePair<string, int> mostusedword in mostUsedWords)
+                {
+                    sbTopic.Append(mostusedword.Key + ",");
+                    topic.name += (mostusedword.Key + ",");
+                }
                 sbTopic.AppendLine();
             }
 
@@ -79,9 +104,9 @@ namespace EvolutionaryPatternSearch
                 foreach (Topic t in cont.Topics)
                 {
                     int wordsintopic = doc.Words.Count(w => w.Topic == t);
-                    sbTopic.Append(wordsintopic * 100 / wordsindoc  + ",");                    
+                    sbTopic.Append(t.name+"{"+(wordsintopic * 100 / wordsindoc)  + "},");                    
                 }
-                sbTopic.Append(")");
+                sbTopic.Append(")");                
                 sbTopic.AppendLine();
             }
             tbRes.Text = sbTopic.ToString();
@@ -142,26 +167,48 @@ namespace EvolutionaryPatternSearch
             StringBuilder sbTopic = new StringBuilder();
             foreach (Topic topic in cont.Topics)
             {
-                string topicname = string.Empty;
+                topic.name = string.Empty;
                 int highestamount = 0;
                 sbTopic.Append(topic.name + ":");
-
+                Dictionary<string, int> mostUsedWords = new Dictionary<string, int>();
                 foreach (Document document in cont.Documents)
                 {
                     foreach (string word in document.Words.Where(w => w.Topic == topic).OrderBy(t => t.Name).Select(w => w.Name).Distinct())
                     {
                         int amountword = document.Words.Count(w => w.Name == word);
-                        if (amountword > highestamount)
+                        //if (amountword > highestamount)
+                        //{
+                        //    highestamount = amountword;
+                        //    topicname = word;
+                        //}
+                        if (mostUsedWords.Count < topWordsNumber)
                         {
-                            highestamount = amountword;
-                            topicname = word;
+                            mostUsedWords.Add(word, amountword);
+                        }
+                        else
+                        {
+                            List<KeyValuePair<string, int>> dictWords = mostUsedWords.Where(w => w.Value < amountword).ToList();
+                            if (dictWords.Count > 0 && !mostUsedWords.ContainsKey(word))
+                            {
+                                KeyValuePair<string, int> wordToDelete = dictWords.First();
+                                mostUsedWords.Remove(wordToDelete.Key);
+                                mostUsedWords.Add(word, amountword);
+                            }
+                            else if (mostUsedWords.ContainsKey(word))
+                            {
+                                mostUsedWords[word] += amountword;
+                            }
                         }
                         sbTopic.Append(word + " (" + amountword + ") , ");
                     }
                 }
                 sbTopic.AppendLine();
                 sbTopic.AppendLine();
-                sbTopic.Append(topicname);
+                foreach (KeyValuePair<string, int> mostusedword in mostUsedWords)
+                {
+                    sbTopic.Append(mostusedword.Key + ",");
+                    topic.name += (mostusedword.Key + ",");
+                }
                 sbTopic.AppendLine();
             }
 
