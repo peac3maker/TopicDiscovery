@@ -30,10 +30,10 @@ namespace TwitterFeedLogger
 
         private void Start()
         {
-            string userKey = "2203428475-jPrsucJngDOnruGZwzCSFfPJUS3WLKbBz9mo63I";
-            string userSecret = "eHT4Lrr9kOxEpTLzDNhgJAJl0jMzRteLUIcXTrqddQ8en";
-            string consumerKey = "vPEzlOlCTolFJ8j2pumtZg";
-            string consumerSecret = "xwm3qBWxvwJVySMI7udizHyJdr9ClxeyLemKR7E5SI";
+            string userKey = "";
+            string userSecret = "";
+            string consumerKey = ";
+            string consumerSecret = "";
 
             IToken token = new Token(userKey, userSecret,
                 consumerKey, consumerSecret);
