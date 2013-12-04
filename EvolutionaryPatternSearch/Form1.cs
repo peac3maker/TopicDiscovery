@@ -159,7 +159,7 @@ namespace EvolutionaryPatternSearch
             cont = new DocumentContainer(value, topics);
             Random rand = new Random((int)DateTime.Now.Ticks);
             List<Word> result;
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < 100; i++)
             {
                 cont.Perform(rand);
             }
@@ -221,7 +221,7 @@ namespace EvolutionaryPatternSearch
                 {
                     int wordsintopic = doc.Words.Count(w => w.Topic == t);
                     if(wordsindoc != 0)
-                    sbTopic.Append(wordsintopic * 100 / wordsindoc + ",");
+                        sbTopic.Append(t.name + "{" + (wordsintopic * 100 / wordsindoc) + "},");
                 }
                 sbTopic.Append(")");
                 sbTopic.AppendLine();

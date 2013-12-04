@@ -32,7 +32,7 @@ namespace TwitterFeedLogger
         {
             string userKey = "";
             string userSecret = "";
-            string consumerKey = ";
+            string consumerKey = "";
             string consumerSecret = "";
 
             IToken token = new Token(userKey, userSecret,
