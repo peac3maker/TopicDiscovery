@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TwitterFeedLogger;
 
@@ -12,6 +13,14 @@ namespace EvolutionaryPatternSearch
     public class DocumentContainer
     {
         private List<Document> documents = new List<Document>();
+
+        List<Tuple<Document, Topic, Word>> wordValues = new List<Tuple<Document, Topic, Word>>();
+
+        public List<Tuple<Document, Topic, Word>> WordValues
+        {
+            get { return wordValues; }
+            set { wordValues = value; }
+        }
 
         public List<Document> Documents
         {
@@ -30,19 +39,90 @@ namespace EvolutionaryPatternSearch
 
         public DocumentContainer(DirectoryInfo dir, List<Topic> topics)
         {
+            Random rand = new Random((int)DateTime.Now.Ticks);
             this.Topics = topics;
             foreach (FileInfo fi in dir.GetFiles())
             {
-                documents.Add(new Document(fi,topics));
+                Document doc = new Document(fi.Name);
+                foreach (Word word in GetWords(fi, rand))
+                {
+                    int topicId = rand.Next(0, topics.Count);
+                    Topic topic = topics[topicId];
+                    wordValues.Add(new Tuple<Document, Topic, Word>(doc, topic, word));
+                }
             }
         }
 
+        public List<Word> GetWords(FileInfo file, Random rand)
+        {
+            List<Word> words = new List<Word>();
+            using (TextReader rd = file.OpenText())
+            {
+                string line;
+                while ((line = rd.ReadLine()) != null)
+                {
+                    foreach (string wordFound in GetWords(line))
+                    {
+                        if (StopWords.stopWords.Contains(wordFound))
+                        {
+                            continue;
+                        }
+                        //random topic                        
+                        words.Add(new Word(wordFound));
+                    }
+                }
+            }
+            return words;
+        }
+
+        public List<Word> GetWords(TweetItem tweet, Random rand)
+        {
+            List<Word> words = new List<Word>();
+            string line = tweet.Text;
+            foreach (string wordFound in GetWords(line))
+            {
+                if (StopWords.stopWords.Contains(wordFound))
+                {
+                    continue;
+                }
+                //random topic                        
+                words.Add(new Word(wordFound));
+            }
+            return words;
+        }
+
+        static string[] GetWords(string input)
+        {
+            MatchCollection matches = Regex.Matches(input, @"\b[\w{3,}']*\b");
+            var words = from m in matches.Cast<Match>()
+                        where !string.IsNullOrEmpty(m.Value)
+                        select TrimSuffix(m.Value).Trim().ToLower();
+            return words.ToArray();
+        }
+
+        static string TrimSuffix(string word)
+        {
+            int apostropheLoc = word.IndexOf('\'');
+            if (apostropheLoc != -1)
+            {
+                word = word.Substring(0, apostropheLoc);
+            }
+            return word;
+        }       
+
         public DocumentContainer(List<TweetItem> tweets, List<Topic> topics)
         {
+            Random rand = new Random((int)DateTime.Now.Ticks);
             this.Topics = topics;
             for (int i = 0; i < tweets.Count; i++)
             {
-                documents.Add(new Document(tweets[i], topics,i));
+                Document doc = new Document(i.ToString());
+                foreach (Word word in GetWords(tweets[i], rand))
+                {
+                    int topicId = rand.Next(0, topics.Count);
+                    Topic topic = topics[topicId];
+                    wordValues.Add(new Tuple<Document, Topic, Word>(doc, topic, word));
+                }
             }
         }
 
@@ -50,10 +130,9 @@ namespace EvolutionaryPatternSearch
 
         public void Perform(Random rand)
         {                        
-            foreach (Document doc in Documents)
-            {
-                foreach (Word word in doc.Words)
-                {                    
+            for (int i = 0; i<wordValues.Count; i++)
+            {                    
+                Tuple<Document,Topic,Word> wordValue  =  wordValues[i];
                     //Dictionary<Topic, double> results = new Dictionary<Topic, double>();
                     //foreach (Topic topic in topics)
                     //{
@@ -66,20 +145,22 @@ namespace EvolutionaryPatternSearch
                     ConcurrentDictionary<Topic, double> results = new ConcurrentDictionary<Topic, double>();
                     Parallel.ForEach(topics, topic =>
                     {
-                        int WinTopic = doc.Words.Count(w => w.Topic == topic);
-                        double propWordinDoc = (double)WinTopic / doc.Words.Count;
-                        if (topic.WordsInTopic == -1) 
-                            topic.WordsInTopic = GetAmountOfWordsAssignedTopic(word.Topic);
-                        double propWordTopic = (double)GetTimesWordsAssignedTopic(word, topic) / topic.WordsInTopic; 
+                        //int WinTopic = doc.Words.Count(w => w.Topic == topic);
+                        int WinTopic = wordValues.Count(w => w.Item2 == topic && w.Item1 == wordValue.Item1);
+                        double propWordinDoc = (double)WinTopic / wordValues.Count(w=>w.Item1 == wordValue.Item1);
+                        if (topic.WordsInTopic == -1)
+                            topic.WordsInTopic = wordValues.Count(w => w.Item2 == wordValue.Item2);
+                        int timeWordAssignedTopic = wordValues.Count(w => w.Item2 == wordValue.Item2 && w.Item3.Name.Equals(wordValue.Item3.Name));
+                        double propWordTopic = (double)timeWordAssignedTopic / topic.WordsInTopic;
+                        //double propWordTopic = (double)GetTimesWordsAssignedTopic(word, topic) / topic.WordsInTopic; 
                         double res = propWordinDoc * propWordTopic;
                         results.AddOrUpdate(topic, res, (key,oldValue) => res);
                     });
                     Topic newTopic = GetNewTopic(results.ToDictionary(kvp=>kvp.Key, kvp=>kvp.Value));
-                    word.Topic.WordsInTopic--;
-                    word.Topic = newTopic;
+                    wordValue.Item2.WordsInTopic--;
+                    wordValue = new Tuple<Document,Topic,Word>(wordValue.Item1,newTopic,wordValue.Item3);
                     newTopic.WordsInTopic++;
-                }
-            }                        
+                }                                    
         }
 
         private Topic GetNewTopic(Dictionary<Topic, double> results)
@@ -108,26 +189,6 @@ namespace EvolutionaryPatternSearch
             }
             return null;
             
-        }
-
-        private int GetTimesWordsAssignedTopic(Word word, Topic topic)
-        {
-            int amount = 0;
-            foreach (Document doc in Documents)
-            {
-                amount += doc.Words.Count(w => w.Topic == topic && w.Name.Equals(word.Name));
-            }
-            return amount;
-        }
-
-        private int GetAmountOfWordsAssignedTopic(Topic topic)
-        {
-            int amount = 0;
-            foreach (Document doc in Documents)
-            {
-                amount += doc.Words.Count(w => w.Topic == topic);
-            }
-            return amount;
         }
 
     }
